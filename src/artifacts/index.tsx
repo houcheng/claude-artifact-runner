@@ -1,16 +1,44 @@
-import { useState } from 'react';
-import { AlertCircle, Mail, Lock, Github, Facebook, Twitter } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useState, useEffect } from 'react';
+import { FileText, Search, Loader2, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Link } from "react-router-dom";
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
-const LoginForm = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+interface Artifact {
+  name: string;
+  path: string;
+}
+
+const ArtifactList = () => {
+  const [artifacts, setArtifacts] = useState<Artifact[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchArtifacts = async () => {
+      try {
+        const response = await fetch('/__artifacts');
+        if (!response.ok) {
+          throw new Error('Failed to fetch artifacts');
+        }
+        const data = await response.json();
+        setArtifacts(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+        console.error('Error fetching artifacts:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchArtifacts();
+  }, []);
+
+  const filteredArtifacts = artifacts.filter(artifact =>
+    artifact.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,84 +60,55 @@ const LoginForm = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-2xl mx-4">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">Demo Login Component</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">
+            Available Artifacts
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <Button type="submit" className="w-full">Log In</Button>
-          </form>
+        <CardContent className="space-y-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search artifacts..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
 
-          {error && (
-            <Alert variant="destructive" className="mt-4">
+          {isLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : error ? (
+            <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
             </Alert>
+          ) : filteredArtifacts.length > 0 ? (
+            <div className="space-y-2">
+              {filteredArtifacts.map((artifact) => (
+                <Link
+                  key={artifact.path}
+                  to={`/${artifact.path.replace('.tsx', '')}`}
+                  className="flex items-center p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <FileText className="h-5 w-5 mr-3 text-muted-foreground" />
+                  <span className="font-medium">{artifact.name}</span>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No artifacts found
+            </div>
           )}
-
-          <div className="relative mt-6">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-3 mt-6">
-            <Button variant="outline" className="w-full flex items-center justify-center gap-2" onClick={() => handleSocialLogin('Github')}>
-              <Github className="h-5 w-5" />
-              GitHub
-            </Button>
-            <Button variant="outline" className="w-full flex items-center justify-center gap-2" onClick={() => handleSocialLogin('Facebook')}>
-              <Facebook className="h-5 w-5" />
-              Facebook
-            </Button>
-            <Button variant="outline" className="w-full flex items-center justify-center gap-2" onClick={() => handleSocialLogin('Twitter')}>
-              <Twitter className="h-5 w-5" />
-              Twitter
-            </Button>
-          </div>
-
-          <div className="text-center text-sm mt-6">
-            Don't have an account?{' '}
-            <Link to="signup" className="text-primary hover:underline font-bold">
-              Sign up
-            </Link>
-          </div>
         </CardContent>
       </Card>
     </div>
   );
 };
 
-export default LoginForm;
+export default ArtifactList;
