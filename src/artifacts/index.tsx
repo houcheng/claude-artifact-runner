@@ -17,46 +17,33 @@ const ArtifactList = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchArtifacts = async () => {
+    const loadArtifacts = async () => {
       try {
-        const response = await fetch('/__artifacts');
-        if (!response.ok) {
-          throw new Error('Failed to fetch artifacts');
-        }
-        const data = await response.json();
-        setArtifacts(data);
+        // Get all .tsx files in artifacts directory except index.tsx
+        const modules = import.meta.glob('./*.tsx', { eager: true });
+
+        const artifactList = Object.keys(modules)
+            .filter(path => !path.endsWith('index.tsx'))
+            .map(path => ({
+              name: path.replace('./', '').replace('.tsx', ''),
+              path: path.replace('./', '')
+            }));
+
+        setArtifacts(artifactList);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
-        console.error('Error fetching artifacts:', err);
+        console.error('Error loading artifacts:', err);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchArtifacts();
+    loadArtifacts();
   }, []);
 
   const filteredArtifacts = artifacts.filter(artifact =>
     artifact.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !password) {
-      setError('Please fill in all fields');
-    } else {
-      setError('');
-      console.log('Login attempted:', { email, password });
-      // Here you would typically handle the login logic
-      alert(`Login attempted: ${email}, ${password}`);
-    }
-  };
-
-  const handleSocialLogin = (platform: string) => {
-    console.log(`${platform} login attempted`);
-    // Here you would typically handle the social login logic
-    alert(`${platform} login attempted`);
-  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
