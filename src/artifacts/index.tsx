@@ -25,6 +25,7 @@ const ArtifactList = () => {
   // 3. Replace loadArtifacts function with this updated version
   const loadArtifacts = async () => {
     try {
+
       // Get all .tsx files in artifacts directory except index.tsx
       const modules = import.meta.glob('./**/*.tsx', { eager: true });
 
@@ -177,7 +178,7 @@ const ArtifactList = () => {
                     ) : (
                         <Link
                             key={artifact.path}
-                            to={`/${artifact.path.replace('.tsx', '')}`}
+                            to={`/${artifact.name.replace('.tsx', '')}`}
                             className="flex items-center p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                         >
                           <FileText className="h-5 w-5 mr-3 text-muted-foreground"/>

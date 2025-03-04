@@ -8,7 +8,16 @@ export default defineConfig({
   plugins: [
     react(),
     Pages({
-      dirs: [{ dir: 'src/artifacts', baseRoute: '' }],
+      dirs: [
+          { dir: 'src/artifacts', baseRoute: '' },
+          { dir: 'src/artifacts/a', baseRoute: '' },
+          { dir: 'src/artifacts/b', baseRoute: '' },
+          { dir: 'src/artifacts/c', baseRoute: '' },
+          { dir: 'src/artifacts/d', baseRoute: '' },
+          { dir: 'src/artifacts/e', baseRoute: '' },
+          { dir: 'src/artifacts/f', baseRoute: '' },
+          { dir: 'src/artifacts/g', baseRoute: '' },
+      ],
       extensions: ['jsx', 'tsx'],   
     }),
   ],
