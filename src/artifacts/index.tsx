@@ -181,7 +181,7 @@ const ArtifactList = () => {
                     ) : (
                         <Link
                             key={artifact.path}
-                            to={`/${artifact.path.replace('.tsx', '')}`}
+                            to={`/${artifact.path.replace('.tsx', '').replace(/\\/g, '/')}`}
                             className="flex items-center p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                         >
                           <FileText className="h-5 w-5 mr-3 text-muted-foreground"/>
