@@ -8,36 +8,7 @@ import './index.css';
 // Function to process routes and handle nested paths
 const processRoutes = (routes: any[]) => {
   return routes.map(route => {
-    // If the path contains a slash, it's a nested route
-    if (route.path.includes('/')) {
-      // Split the path into segments
-      const segments = route.path.split('/');
-      // Create nested route structure
-      let currentRoute = {
-        path: segments[0],
-        children: []
-      };
-      
-      let parent = currentRoute;
-      for (let i = 1; i < segments.length; i++) {
-        const newRoute = {
-          path: segments[i],
-          children: []
-        };
-        parent.children = [newRoute];
-        parent = newRoute;
-      }
-      
-      // Add the actual route as the last child
-      parent.children = [{
-        ...route,
-        path: ''
-      }];
-      
-      return currentRoute;
-    }
-    
-    // Regular route
+    // Add Layout to all routes
     return {
       ...route,
       element: <Layout>{route.element}</Layout>

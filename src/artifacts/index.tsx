@@ -154,19 +154,15 @@ const ArtifactList = () => {
               </Alert>
           ) : filteredArtifacts.length > 0 ? (
               <div className="space-y-2">
-                {filteredArtifacts.map((artifact) => (
-                    <div className="space-y-2">
-                      {currentPath.length > 0 && (
-                          <button
-                              onClick={() => setCurrentPath(currentPath.slice(0, currentPath.length - 1))}
-                              className="flex items-center p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                          >
-                            <ArrowLeft className="h-5 w-5 mr-3 text-muted-foreground"/>
-                            <span className="font-medium">Go back</span>
-                          </button>
-                      )}
-                    </div>
-                ))}
+                {currentPath.length > 0 && (
+                  <button
+                    onClick={() => setCurrentPath(currentPath.slice(0, currentPath.length - 1))}
+                    className="flex items-center p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors mb-2"
+                  >
+                    <ArrowLeft className="h-5 w-5 mr-3 text-muted-foreground"/>
+                    <span className="font-medium">Go back</span>
+                  </button>
+                )}
 
                 {filteredArtifacts.map((artifact) => (
                     artifact.type === 'folder' ? (
@@ -181,7 +177,7 @@ const ArtifactList = () => {
                     ) : (
                         <Link
                             key={artifact.path}
-                            to={`/${artifact.path.replace('.tsx', '').replace(/\\/g, '/')}`}
+                            to={`/${artifact.path.replace('.tsx', '')}`}
                             className="flex items-center p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                         >
                           <FileText className="h-5 w-5 mr-3 text-muted-foreground"/>
